@@ -1,0 +1,171 @@
+---
+title: "Project 1: Exploratory Data Analysis"
+author: "SDS348 Fall 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+## Wasim Meghani, wam2233
+
+## Introduction
+
+  For as long as I can remember, basketball has always been a sport that I have enjoyed playing and watching on TV. It requires endless hours of practicing in order to perfect, and athletes who end up making the National Basketball Association (NBA) have been studying and playing the game their entire lives. One measure of analytics to determine the efficiency of a player on the court is the real plus minus (RPM). RPM is the player's average impact in terms of net point differential per 100 offensive and defensive possesions, and is the sum of the ORPM and DRPM. 
+  
+  For my datasets, I decided to use data from the NBA to explore the efficiency ratings of various players and the correlation with their respective salaries. One of my datasets titled 'rpm' contains NBA player names, number of games played, position, team, and their ORPM, DRPM, and RPM values for the entire 2017 season. The other dataset named 'salary' contains the annual salary for NBA players from 2017 season along with their team names and position. Both these datasets were found on Kaggle, and are interesting to me due to my love for the game of basketball. If real plus minus is truly an accurate measure of player efficiency, it should indeed translate over to the player's annual salary. This data can be used to determine the correlation between RPM and salary based on the player's position, team, and number of games played.
+  
+### 1. Untidying and Tidying data
+
+```{R}
+rpm <- read.csv("~/nba_2017_real_plus_minus.csv")
+salary <- read.csv("~/nba_2017_salary.csv")
+
+glimpse(rpm)
+glimpse(salary)
+
+untidy_rpm<- rpm %>% 
+  separate("NAME", into = c("NAME","POSITION"), sep = ",") %>%
+  pivot_wider(names_from = "POSITION", values_from = "RPM") %>% glimpse()
+
+tidy_rpm<- untidy_rpm %>%
+  pivot_longer(c(" SF"," SG"," C"," PG"," PF"," G"," F"),names_to = "POSITION",values_to = "RPM")%>%
+  na.omit %>% glimpse()
+
+untidy_sal<-salary %>%
+  pivot_wider(names_from = POSITION , values_from = SALARY) %>% glimpse()
+              
+```
+
+  Since both the datasets were initially tidy, I had to use pivot_wider to untidy them. For the dataset titled 'rpm', the player names and respective position were in the same column. I used the separate() function to split name and position into 2 individual columns, and then used pivot_wider to spread out the various positions into 7 distinct columns. The values for these 7 new 'position' variables came from the RPM values, which essentially got rid of the RPM column and spread its values across the 7 positions columns depending on the player's position. 
+  
+  To retidy the data, I used pivot_longer to select each of the 7 newly created position variables (SF, SG, PG, C, P, F, PF) and compress them into a single variable named POSITION. The RPM values associated with the player and position were moved to a column called RPM, and any NAs were omitted from the dataset. This allowed for each observation to have its own row, meaning that the data was tidy.
+  
+  The same process was used for the dataset titled 'salary'. Pivot_wider was used to untidy the data by spreading out the positions into 7 distinct columns, where the player's salary value was inserted into the corresponding player's box. Then, pivot_longer was used to retidy the data by compressing the positions into a single variable called POSITION, and the salary values were returned to the variable SALARY. 
+
+
+### 2. Joining datasets
+
+```{R}
+joindata<-inner_join(tidy_rpm,salary, by="NAME") %>% glimpse()
+```
+
+  I used inner_join() to combine both my datasets because I wanted to ensure my final datasets had no NAs. In order for the final dataset to have a salary and RPM value for each player, I chose a join that would give me players which both datasets had in common. As a result, the final dataset 'joindata' contained 360 total observations. This means that 108 players were lost from the RPM dataset and 89 players were lost from the salary dataset. Since some of these players may have gotten injured during the season, retired, or benched through much of the season, the missing cases will not negatively affect further data exploration. 
+
+
+### 3. Wrangling
+
+```{R}
+# Removes redunant variables POSITION.y and TEAM.x
+joindata %>% select(-c(POSITION.y,TEAM.x)) %>% glimpse()
+
+# only shows data for 1 player: KD
+joindata %>% filter(NAME == "Kevin Durant") 
+
+# shows all players/stats on the Mavs
+joindata %>% filter(TEAM.y == "Dallas Mavericks") %>% arrange(desc(RPM))
+
+# arranges player names and data by descending salary
+joindata %>% group_by(NAME) %>% arrange(desc(SALARY)) %>% glimpse()
+
+# arranges player names and data by ascending RPM (lowest RPM first)
+joindata %>% group_by(NAME) %>% arrange(RPM) %>% glimpse()
+
+# summarizes the number of distinct observations for each variable 
+joindata %>% summarise_all(n_distinct) %>% glimpse()
+
+# Number of players in each team
+joindata %>% 
+  group_by(TEAM.y) %>%
+  summarise(n=n()) %>% arrange(desc(n)) %>% glimpse()
+
+# Who has the minimum salary 
+joindata %>%
+  filter(SALARY==min(SALARY)) %>% summarise(NAME, TEAM.y, POSITION.x, SALARY)
+
+# Who has the maximum salary
+joindata %>%
+  filter(SALARY==max(SALARY)) %>% summarise(NAME, TEAM.y, POSITION.x, SALARY)
+
+# Shows top 5 player RPMs in descending order (highest first)
+joindata %>% top_n(5, RPM) %>% arrange(desc(RPM))
+
+# creates new variable that calculates salary in millions and the player salary per game
+mutatedat<-joindata %>% mutate(SALARY_PER_GAME= SALARY/GP, SALARY_MILLIONS=SALARY/1000000)
+mutatedat %>% select(NAME,SALARY,SALARY_MILLIONS,GP,SALARY_PER_GAME) %>% glimpse()
+
+# Shows how many players each team is paying and the mean, sd, and se values of SALARY in descending order of mean salary
+joindata %>% 
+  group_by(TEAM.y) %>% 
+  summarize(mean_salary=mean(SALARY),sd_salary=sd(SALARY),count_salary=n(),se=(sd_salary/sqrt(count_salary))) %>% arrange(desc(mean_salary)) %>% glimpse()
+
+# Correlation matrix for numeric variables 
+joindata %>% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %>% cor()
+
+```
+
+  Using the various dplyr functions, I was able to explore my joined dataset and calculate multiple summary statistics. In order to remove redundant variables that were formed as a result of joining both datasets, I used the select function to eliminate "POSITION.x" and "TEAM.y". Using the filter function, I was able to isolate data for a specific NBA player or team during the 2017 NBA season, which I did for Kevin Durant and the Dallas Mavericks. When filtering for the team Dallas Mavericks, it showed 7 observations meaning that the dataset included 7 Mavs players, whereas filtering for the player Kevin Durant produced 1 observation with 12 variables. To organize the dataset in terms of descending salary or ascending RPM, I used group_by to group the table by player name and then used the arrange() function. When arranging by descending salary, the names at the top of the list were not too surprising like Lebron James and Russell Westbrook. Arranging players by ascending RPM showed the "least efficient" or players with the lowest RPM values at the top of the table, such as Mario Hezonja and Jahlil Okafor. 
+  
+  In order to calculate summary statistics, I used summarize(), mutate(), and group_by(). For example, to determine the number of unique observations (n) for each variable, I used the summarize_all() function. To determine the number of players present for each team, I used group_by to group the data by team, and then piped it into summarize. I found it interesting that a majority of players in the dataset (18) belonged to the Charlotte Hornets. Using filter() and summarize(), I was able to determine that Pierre Jackson of the Mavs had the lowest salary in the dataset while Lebron James (shocker) had the highest. The function top_n allowed me to produce a table with the top 5 players in terms of their RPM values, which in essence are the top 5 most efficient players in the league. Since dealing with salary values in the millions can be somewhat confusing to look at, I decided to use the mutate() function to create a new variable, SALARY_MILLIONS, which divides the player salary by 1,000,000 to yield the salary in millions. Also, I created a variable called SALARY_PER_GAME, which divides the player's salary by the number of games they played (GP). Both of these variables are depicted in the table above. To calculate average summary statistics of salary for each team, I grouped the data by team and used summarize() to create 4 new variables. The resulting dataset contained mean salary, standard deviation of salary, standard error, and number of players per team in the dataset. Arranging by descending mean salary helped determine that the Golden State Warriors have 7 players in the dataset whom they paid an average salary of 12,703,400 dollars with a standard deviation of 8,076,054 dollars in the 2017 season. 
+  Finally, a correlation matrix for all numeric variables was generated by using select() to remove all categorical variables and piping it to cor(). This showed that the highest positive correlation between 2 numeric variables is 0.924 between RPM and WINS, the latter of which is a variable that provides an estimate of the number of wins a player has contributed to his team's win total based on RPM and possessions played. This makes sense that both variables are strongly correlated since they are in essence functions of one another. The lowest correlation between two variables is -0.0886 between ORPM and DRPM, since they are essentially opposites with one measuring the points scored per 100 offensive possessions and the other measuring the points allowed per 100 defensive possessions. 
+
+
+### 4. Visualising 
+
+```{R}
+library(ggplot2)
+
+# Plots the mean salary (in millions) for each team based on player position as a bar plot
+ggplot(data = mutatedat, aes(x=TEAM.y, y=SALARY_MILLIONS, fill=POSITION.x)) + 
+  geom_bar(aes(y=SALARY_MILLIONS), stat = "summary", fun.y="mean") +
+  theme_dark() + scale_fill_brewer() + theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  xlab("NBA Team")+
+  ylab("Mean salary (in millions of $)")+
+  ggtitle("Mean Combined Salary of NBA Teams based on Player Position") + labs(fill = "Position")
+
+# scatterplot showing relationship between player RPM and corresponding salary
+ggplot(data = mutatedat, aes(x= RPM, y=SALARY_MILLIONS)) +
+  geom_point(aes(y=SALARY_MILLIONS), color="blue")+ 
+  ggtitle("NBA Player Salary based on Real Plus Minus")+
+  xlab("Real Plus Minus (RPM)")+ ylab("Annual Salary (in millions of $)")
+
+
+```
+
+  The first plot pictured above is a bar plot, which plots the mean salary (in millions of dollars) for each NBA team based on player position. Each bar is filled with multiple shades of blue, each shade representing a specific NBA position as labeled by the legend. The team with the highest mean combined salary is the Cleveland Caveliers, which makes sense since Lebron James alone has a salary of around $30 million. Comparitively, teams like the Brooklyn Nets, Detroit Pistons, and Minnesota Timberwolves have a mean combined salary of less than 30 million. When looking at the distribution of player position in relation to salary, PF and PG account for a majority of most of the bars. This is probably because point guards and power forwards are required to handle the ball a lot, and they have to be the primary playmakers in many situations. 
+  
+  The second plot is a scatterplot that shows the relationship between a player's RPM (real plus minus) on the x axis and their corresponding annual salary in millions of dollars. It is evident that there is a positive correlation between RPM and salary, where a higher RPM corresponds to a higher salary and vice versa. As seen by the cluster of blue dots in the middle of the plot, the majority of NBA players are average in terms of efficiency with their RPMs hovering around 0. As a result, their salary is realtively quite low on the spectrum ranging from $1-10 million dollars. However, as the RPM and salary values become more extreme, the dots appear to be more spread out. This explains why players like Lebron James, Russell Westbrook, and James Harden have astronomically high salaries; their real plus minus values are significantly higher than the average NBA player. This allows elite/efficient players like them to earn 2 to 3 times as much as their fellow teammates. 
+
+
+### 5. Dimensionality Reduction
+
+```{R}
+nba_pca<- joindata %>% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %>% 
+  scale() %>% prcomp()
+
+joindata %>% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %>% cor() %>% eigen()
+
+summary(nba_pca, loadings=T)
+
+# Loadings plot (which variables contribute to which PCs)
+nba_pca$rotation[,1:2]%>%as.data.frame%>%rownames_to_column%>%
+  ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+  geom_vline(aes(xintercept=0),lty=2)+ylab("PC2")+xlab("PC1")+
+  geom_segment(aes(x=0,y=0,xend=PC1,yend=PC2),arrow=arrow(),col="red")+
+  geom_label(aes(x=PC1*1.1,y=PC2*1.1,label=rowname)) + ggtitle("Loadings Plot")
+
+
+
+```
+
+  By running a principal component analysis on all numeric variables in the combined dataset, I was able to interpret the correlation between various numeric variables. The loadings plot above shows which variables contribute to which principal components (either PC1 or PC2). Based on the angles between the variable vectors, SALARY and ORPM (offensive real plus minus) have the highest correlation because the angle between both vectors is the smallest. This means that more offensively efficient players are likely to have a higher salary. RPM and WINS also have a high correlation, which makes sense since WINS is a function of the player's Real-Plus-Minus and his number of possessions played. Furthermore, ORPM and MPG have a high correlation meaning that more minutes played in a game correlates with a higher offensive efficiency rating, or simply more minutes = more points scored.
+
+
+
+
