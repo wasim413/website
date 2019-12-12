@@ -1,0 +1,4 @@
+"0","rpm <- read.csv(""Desktop/website/content/nba_2017_real_plus_minus.csv"")"
+"2","cannot open file 'Desktop/website/content/nba_2017_real_plus_minus.csv': No such file or directory"
+"2","Error in file(file, ""rt"") : cannot open the connection
+"

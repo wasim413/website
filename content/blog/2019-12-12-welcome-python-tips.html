@@ -1,0 +1,17 @@
+---
+title: 'Welcome: Python tips'
+author: Wasim Meghani
+date: '2019-12-12'
+slug: welcome-python-tips
+categories: []
+tags: []
+description: ''
+---
+
+
+
+<p>In the last unit of SDS 348 or Computational Biology this semester, I learned some very interesting skills about the coding language Python. While I had taken an introductory course to Python a semester earlier, I ended up gaining more useful skills from this course. For example, by importing the regex library, I learned how to use the findall() method which allows you to find a specific character or element in a collection of several items. When it comes to identifying a sequence in a large collection of nucelotides, this function could definitely come in handy!</p>
+<p>For example, if you have a set of multiple DNA sequences separated by a “&gt;” character and you wanted to determine the number of sequences present, you could run the following code:</p>
+<pre><code>num = re.findall(r&quot;&gt;&quot;,fasta)
+print(len(num))</code></pre>
+<p>In the above code, the findall() method requires 2 arguments; the element you are searching for and the string in which it is present. The len() function returns the length of the string, or the number of elements present.</p>

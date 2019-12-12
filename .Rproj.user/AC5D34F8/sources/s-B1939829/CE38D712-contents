@@ -1,0 +1,307 @@
+---
+title: "Project 2: Modeling, Testing, Predicting"
+output:   
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("plyr")
+library("plyr") 
+install.packages("lmtest", repos = "http://cran.us.r-project.org")
+
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+## Wasim Meghani, wam2233
+
+## Introduction
+
+  From a very young age, I have loved watching and playing basketball due to the thrill of the game. It takes serious individual talent in order to make plays and score baskets, which is why efficiency statistics such as real plus minus, ORPM, and DRPM are so important in determining the value of a specific player. The dataset I chose contains all player and team data from the 2017 NBA season that particularly explores efficiency ratings of players based on real plus minus, or RPM. Since durability is also a very important part of being an NBA player, statistics such as minutes per game (MPG), the number of games played (GP), and if the player played the majority of the season (> 41 games, MSP) were also included in the dataset. Other variables include each player's full name, team name, RPM, ORPM, DRPM, WINS, Position played, and salary. 
+
+
+## 1. MANOVA test
+
+```{R}
+nba <- read.csv("/Users/Wasim/Desktop/website/content/nba.csv")
+glimpse(nba)
+
+# MANOVA test to test whether RPM or MPG differ by POSITION
+# assumption: multivariate normality and equal variances 
+
+# 1 MANOVA
+nbaMan<-manova(cbind(GP,MPG,RPM,WINS)~POSITION, data = nba)
+summary(nbaMan)
+
+# 4 ANOVA tests
+summary.aov(nbaMan)
+
+nba%>%group_by(POSITION)%>%summarize(mean(GP),mean(MPG),mean(RPM),mean(WINS))
+
+# 21 x 4 = 84 post hoc t-tests
+pairwise.t.test(nba$GP,nba$POSITION, p.adj="none")
+pairwise.t.test(nba$MPG,nba$POSITION, p.adj="none")
+pairwise.t.test(nba$RPM,nba$POSITION, p.adj="none")
+pairwise.t.test(nba$WINS,nba$POSITION, p.adj="none")
+
+# bonferroni correction is 0.05/89 = 0.0005618
+
+```
+
+  A MANOVA test was conducted to determine the effect of the Position played (C,F,G,PF,PG,SF) on 4 dependent variables (GP,MPG,RPM,WINS). The null hypothesis is that for GP, MPG, RPM, and WINS, the means of each Position played are equal. The alternate hypothesis is that for at least one of the numeric variables, at least one Position mean is different. Both assumptions of multivariate normality and equal variances were met. Significant differences were found among the 6 positions on the 4 dependent variables, Pillai trace = 0.24, F(24,1412) = 3.76, p < 0.0001. Because it is significant, I ran 4 univariate ANOVAs to see which variables were significant. All together, there was 1 MANOVA, 4 ANOVAs, and 84 t-tests for a total of 89 tests. Using the bonferroni adjustment, the significance level was adjusted to yield a value of 0.05/89 or 0.00056. This means that the probability of making at least one type 1 error is 0.00056. The univariate ANOVAs for MPG and RPM were significant, F(6,353) = 4.61, p < 0.0001, and F(6,353) = 4.72, p < 0.0001, respectively. 
+  Post hoc analysis was also performed by conducting pairwise t-tests to determine which position specifically differed in MPG, RPM, GP, and WINS. The positions of PG and F along with SF and F differ in minutes per game (MPG) while the positions SG and C differ significantly from each other in terms of real plus minus (RPM) after adjusting for bonferroni. 
+
+## 2. Randomization test
+
+```{R}
+# null: MPG is the same for players who played majority of the season and those who did not
+# alternate: MPG is for different players who played majority of the season and those who did not
+
+ggplot(nba,aes(MPG,fill=MSP))+geom_histogram(bins=6.5)+facet_wrap(~MSP,ncol=2)
+# original mean difference 
+nba%>%group_by(MSP)%>%summarize(means=mean(MPG))%>%summarize(diff(means)) %>% glimpse() 
+
+# Randomization test
+nba_diff<-vector()
+for(i in 1:5000){
+new1<-data.frame(MPG=sample(nba$MPG),MSP=nba$MSP)
+nba_diff[i]<-mean(new1[new1$MSP=="True",]$MPG)-
+ mean(new1[new1$MSP=="False",]$MPG) }
+
+# p value for 2 way t test
+mean(nba_diff > 12.44988)*2
+
+{hist(nba_diff,main="",ylab=""); abline(v = 12.44988,col="red")}
+
+# independent samples t test for comparison 
+t.test(data=nba,MPG~MSP)
+
+```
+
+Null hypothesis: Minutes per game (MPG) is the same for players who played the majority of the season and those who did not (MSP).
+Alternative: MPG is different for players who played the majority of the season and those who didn't.
+
+A randomization distribution test was performed to determine if the difference in mean MPG for players who played the majority of the season versus those who did not was significant. The original mean difference was 12.450 minutes. The p value or probability of observing a mean difference as extreme as 12.450 minutes was equal to 0. In comparison, when an independent samples t-test was performed, the p value was also very close to 0 with a value of 2.2 x 10^-16. Thus, we can reject the null hypothesis and determine that a player's minutes per game (MPG) are significantly different for someone who played the majority of the season versus someone who did not. 
+
+## 3. Linear Regression Model 
+
+```{R}
+# predicting RPM from MPG and GP
+# first center numeric variables MPG and GP
+nba$MPG_c <- nba$MPG - mean(nba$MPG, na.rm=T)
+nba$GP_c <- nba$GP - mean(nba$GP, na.rm=T)
+
+# multiple regression with interaction
+nbafit<-lm(RPM ~ GP_c * MPG_c, data=nba)
+summary(nbafit)
+
+# plot for numeric by numeric interaction
+library(stats)
+new1<-nba
+new1$GP_c<-mean(nba$GP_c)
+new1$mean<-predict(nbafit,new1)
+new1$GP_c<-mean(nba$GP_c)+sd(nba$GP_c)
+new1$plus.sd<-predict(nbafit,new1)
+new1$GP_c<-mean(nba$GP_c)-sd(nba$GP_c)
+new1$minus.sd<-predict(nbafit,new1)
+newint<-new1%>%select(RPM,MPG_c,mean,plus.sd,minus.sd)%>%gather(Age,value,-RPM,-MPG_c)
+
+mycols<-c("#619CFF","#F8766D","#00BA38")
+names(mycols)<-c("-1 sd","mean","+1 sd")
+mycols=as.factor(mycols)
+
+ggplot(nba,aes(MPG_c,RPM),group=mycols)+geom_point()+geom_line(data=new1,aes(y=mean,color="mean"))+geom_line(data=new1,aes(y=plus.sd,color="+1 sd"))+geom_line(data=new1,aes(y=minus.sd,color="-1 sd"))+scale_color_manual(values=mycols)+labs(color="Games Played")+theme(legend.position=c(.9,.2))
+
+# Assumptions (linearity, homoskedaskity)
+resids<-nbafit$residuals
+fitvals<-nbafit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+
+# Assumption (normality)
+ggplot()+geom_histogram(aes(resids), bins=20)
+ggplot()+geom_qq(aes(sample=resids))+geom_qq_line(aes(sample=resids), color='red')
+
+# uncorrected standard errors 
+summary(nbafit)$coef[,1:2]
+# regression with robust standard errors 
+library(sandwich)
+library(lmtest)
+coeftest(nbafit, vcov = vcovHC(nbafit))[,1:2]
+
+# same regression model without interaction
+nbafit2<-lm(RPM ~ GP_c + MPG_c, data=nba)
+summary(nbafit2)
+# likelihood ratio test 
+
+```
+
+Null: While controlling for minutes per game (MPG), the number of games (GP) played does not explain variation in RPM. 
+Null: While controlling for the number of games played (GP), MPG does not explain variation in RPM.
+
+The intercept of -1.107 is the predicted value of RPM when GP and MPG are equal to 0. The coefficient for GP_c of 0.0158 is the slope for GP on RPM while holding MPG constant. On the other hand, 0.158 is the slope for MPG on RPM while holding GP constant. After mean centering both numeric variables of GP and MPG, the interaction coefficient of 0.0032 is the slope for games played (GP) on RPM based on varying levels of minutes per game (MPG). 
+
+For the assumptions, the homoskedasticity assumption was met since the plot shows most of the points fairly equidistant from the regression line (in red). Also, the normality assumption was met since the histogram shows a distribution that closely resembles a normal distribution. The residuals plot also shows the dots in close proximity to the line of residuals. 
+
+When running the regression with robust standard errors, the robust SEs were slightly larger than the uncorrected SE values. The robust SE for GP_c was 0.0076 compared to 0.0071, while the robust SE for MPG_c was 0.0184 compared to 0.0159. The robust SEs should be used since they are corrrected and robust to violations of heteroskedasticity. 
+
+The R^2 value from summary(nbafit) is the proportion of variation in RPM explained by the overall model 'nbafit' was 0.3516. This means that my model explains 35.16% of the variation in RPM. Compared to model with interaction, the model without interaction has a lower coefficient value for GP_c of -0.0019, meaning that the slope for GP on RPM while holding MPG constant is negative. The intercept coefficient is slightly higher, and the coefficient for MPG_c is almost identical at 0.159. 
+
+## 4. Bootstrapped standard errors 
+
+```{R}
+# bootstrapped standard errors for same interaction model as above
+boot_dat<-nba[sample(nrow(nba),replace=TRUE),]
+samp_boot<-replicate(5000, {
+ boot_dat<-boot_dat[sample(nrow(boot_dat),replace=TRUE),]
+ fit<-lm(RPM ~ GP_c * MPG_c, data=boot_dat)
+ coef(fit)
+})
+samp_boot%>%t%>%as.data.frame%>%summarize_all(sd)
+```
+
+Compared to the original and robust standard errors, the bootstrapped standard errors are slightly larger than the original and slightly smaller than the robust SEs. The intercept SE was highest for the bootstrapped model with 0.140 and smallest for the original model with a value of 0.131.
+
+## 5. Logistic Regression
+
+```{R}
+library(ggplot2)
+# make binary variable "y" which corresponds to MSP (Majority of season played); if player played in > 41 games then T or 1; else F or 0
+nba$MSP<-ifelse(nba$GP >= 41, "True", "False")
+nba %>% count(MSP)
+nba$y<-ifelse(nba$MSP=="True",1,0)
+
+# logistic regression: predict y from Position and RPM
+nbaLogFit<-glm(y~POSITION+RPM, data=nba, family=binomial(link = "logit"))
+summary(nbaLogFit)
+coeftest(nbaLogFit)
+# exponentiated coefficients (odds scale)
+exp(coef(nbaLogFit)) %>% round(3)%>%t
+
+# confusion matrix 
+probPlay<-predict(nbaLogFit, type = "response")
+pred<-ifelse(probPlay>.5,1,0)
+table(truth=nba$y, prediction=pred)%>%addmargins
+(263+9)/360   # accuracy
+9/85          # specificity (tnr)
+263/275       # sensitivity (tpr)
+263/339       # precision or recall (ppv)
+
+# logit plot
+ggplot(nba, aes(y,probPlay)) + geom_point(aes(color = nba$y))
+
+# ROC plot
+library(plotROC)
+ROCplot<- ggplot(nba) + geom_roc(aes(d=y, m=probPlay), n.cuts = 0) +
+ geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2) 
+ROCplot
+calc_auc(ROCplot)
+
+# 10 fold CV
+set.seed(1234)
+k=10
+nba1<- nba[sample(nrow(nba)),]
+folds<- cut(seq(1:nrow(nba)), breaks=k, labels=F)
+
+diags<-NULL
+for(i in 1:k){
+ nbaCV<-nba1[folds!=i,]
+ test<-nba1[folds==i,]
+ truth<-test$y
+ fit<-glm(y~POSITION+RPM, data=nbaCV,family="binomial")
+ probs<-predict(fit,newdata = test,type="response")
+ ## Test model on test set (save all k results)
+ diags<-rbind(diags,class_diag(probs,truth))
+}
+apply(diags,2,mean)
+
+```
+
+After running a logistic regression to predict if a player played the majority of the season (y) based on Position played and his RPM, the exponentiated coefficients were interpreted. 
+Intercept: 4.544 is the odds of a player to play the majority of the season for someone with RPM = 0 and who plays the "C" or center position since that is the reference group. 
+RPM: 1 additional point increase in RPM increases odds that a player plays the majority of the season by a factor of 1.432 while controlling for Position. 
+POSITION F: The odds for someone playing the generic Forward position to play a majority of the season are 0.499 times the odds for someone playing the Center position while controlling for RPM. 
+POSITION G: The odds for someone playing the generic Guard position are 0.254 times the odds for someone playing "C" Position while controlling for RPM. 
+POSITION PF: The odds for someone playing the Power Forward position are 1.113 times the odds for someone playing "C" Position while controlling for RPM. 
+POSITION PG: The odds for someone playing the Point Guard position are 1.165 times the odds for someone playing "C" Position to play the majority of the season while controlling for RPM. 
+POSITION SF: The odds for someone playing the Small Forward position to play the majority of the season are 0.875 times the odds for someone playing "C" Position while controlling for RPM. 
+POSITION SG: The odds for someone playing the Shooting Guard position to play the majority of the season are 1.679 times the odds for someone playing "C" Position while controlling for RPM. 
+
+A confusion matrix was produced in order to determine and compute the values of accuracy, sensitivity, specificity, and recall. The sensitivity or true positive rate was 263/275 or 0.956, which is the probability of correctly determining if a player played the majority of the season if they really did. The specificity or true negative rate was 9/85 or 0.106. Recall or PPV was determined to be 263/339 or 0.776, which is the proportion of those classified as majority season players who actually did play the majority. Lastly, the Accuracy was calculated to be (263+9)/360 or 0.756. 
+
+Based on the ROC plot and calculated AUC value of 0.727, the model is considered fair. This means that it is relatively difficult to predict if a player played the majority of a season (MSP) from just Position and Real Plus Minus (RPM). 
+
+After running a 10 fold CV, the average out of sample Accuracy was determined to be 0.75, the Sensitivity was 0.947, and the Recall or PPV was 0.774. Compared to the AUC value generated by the ROC curve of 0.727, the AUC after running a 10 fold CV was slightly smaller with a value of 0.712. However, this still means that the model is in the "fair" range at predicting if a player played the majority of the season.  
+
+
+## 6. LASSO Regression
+
+```{R}
+# generating model that predicts y from all other variables
+nbaNew<- nba %>% select(GP,MPG,ORPM,DRPM,RPM,WINS,SALARY,POSITION,y)
+nbaAll<-glm(y~. , data = nbaNew, family = "binomial")
+
+# LASSO regression predicting y from all other variables in nba dataset
+install.packages("glmnet")
+library(glmnet)
+
+set.seed(1234)
+x<-model.matrix(nbaAll)
+x<-x[,-1]%>%scale%>%as.matrix
+y<-as.matrix(nbaNew$y)
+cv<-cv.glmnet(x,y,family='binomial')
+lasso<-glmnet(x,y,family='binomial',lambda=cv$lambda.1se)
+coef(cv)
+
+# 10 fold CV using LASSO model
+set.seed(1234)
+k=10
+nbaLass<- nba %>% select(GP,MPG,POSITION,y) 
+data2<- nbaLass[sample(nrow(nbaLass)),]
+folds<- cut(seq(1:nrow(nbaLass)), breaks=k, labels=F)
+
+diags<-NULL
+for(i in 1:k){
+ nbaLassCV<-data2[folds!=i,]
+ test<-data2[folds==i,]
+ truth<-test$y
+ fit<-glm(y~.,data=nbaLassCV,family="binomial")
+ probs<-predict(fit,newdata = test,type="response")
+ ## Test model on test set (save all k results)
+ diags<-rbind(diags,class_diag(probs,truth))
+}
+apply(diags,2,mean)
+
+
+
+```
+
+The variables retained after performing a LASSO regression were GP, MPG, and POSITION_F,G,PF,PG,SF, and SG since they all had non-zero coefficients. Compared to the full model in terms of out-of-sample prediction, the LASSO model has a significantly higher AUC value of 0.989. This means that the LASSO 10 fold CV model is a "great" predictor compared to just "fair". Since the response was binary, the Accuracy was also looked at compared to the full model. While the logistic regression model had an accuracy of 0.750, the LASSO model had a much higher out-of-sample accuracy value of 0.981. Thus, this model does a much better job at predicting whether a player played the majority of the season based on his MPG, GP, and Position played.  

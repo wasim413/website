@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576183432717.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "478255688",
+    "id" : "3DF223E8",
+    "lastKnownWriteTime" : 1576184453,
+    "last_content_update" : 1576184453542,
+    "path" : "~/Desktop/website/content/blog/2019-12-12-welcome-python-tips.Rmd",
+    "project_path" : "content/blog/2019-12-12-welcome-python-tips.Rmd",
+    "properties" : {
+        "cursorPosition" : "16,223",
+        "scrollLine" : "10"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wasim Meghani" />
+    <meta name="description" content="Describe your website">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 2: Modeling, Testing, Predicting</title>
+    <meta name="generator" content="Hugo 0.60.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project2/">Project 2: Modeling, Testing, Predicting</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="wasim-meghani-wam2233" class="section level2">
+<h2>Wasim Meghani, wam2233</h2>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>From a very young age, I have loved watching and playing basketball due to the thrill of the game. It takes serious individual talent in order to make plays and score baskets, which is why efficiency statistics such as real plus minus, ORPM, and DRPM are so important in determining the value of a specific player. The dataset I chose contains all player and team data from the 2017 NBA season that particularly explores efficiency ratings of players based on real plus minus, or RPM. Since durability is also a very important part of being an NBA player, statistics such as minutes per game (MPG), the number of games played (GP), and if the player played the majority of the season (&gt; 41 games, MSP) were also included in the dataset. Other variables include each player’s full name, team name, RPM, ORPM, DRPM, WINS, Position played, and salary.</p>
+</div>
+<div id="manova-test" class="section level2">
+<h2>1. MANOVA test</h2>
+<pre class="r"><code>nba &lt;- read.csv(&quot;/Users/Wasim/Desktop/website/content/nba.csv&quot;)
+glimpse(nba)</code></pre>
+<pre><code>## Observations: 360
+## Variables: 16
+## $ X         &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …
+## $ NAME      &lt;fct&gt; LeBron James, Stephen Curry, Jimmy Butler, Russell Westbroo…
+## $ TEAM_abb  &lt;fct&gt; CLE, GS, CHI, OKC, GS, UTAH, HOU, SA, LAC, DEN, MIL, NO, GS…
+## $ GP        &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 62, 69, 72,…
+## $ MPG       &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9,…
+## $ ORPM      &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44,…
+## $ DRPM      &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.2…
+## $ WINS      &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13.…
+## $ POSITION  &lt;fct&gt;  SF,  PG,  SG,  PG,  PF,  C,  SG,  SF,  PG,  C,  SF,  PF,  …
+## $ RPM       &lt;dbl&gt; 8.42, 7.41, 6.62, 6.27, 7.14, 6.37, 4.81, 7.08, 7.92, 6.73,…
+## $ TEAM_full &lt;fct&gt; Cleveland Cavaliers, Golden State Warriors, Chicago Bulls, …
+## $ SALARY    &lt;dbl&gt; 30963450, 12112359, 17552209, 26500000, 15330435, 2121288, …
+## $ MSP       &lt;fct&gt; True, True, True, True, True, True, True, True, True, True,…
+## $ y         &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+## $ GP_c      &lt;dbl&gt; 15.830556, 20.830556, 17.830556, 22.830556, 17.830556, 22.8…
+## $ MPG_c     &lt;dbl&gt; 16.275556, 11.875556, 15.475556, 13.075556, 10.975556, 12.3…</code></pre>
+<pre class="r"><code># MANOVA test to test whether RPM or MPG differ by POSITION
+# assumption: multivariate normality and equal variances 
+
+# 1 MANOVA
+nbaMan&lt;-manova(cbind(GP,MPG,RPM,WINS)~POSITION, data = nba)
+summary(nbaMan)</code></pre>
+<pre><code>##            Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## POSITION    6 0.24021   3.7588     24   1412 2.941e-09 ***
+## Residuals 353                                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># 4 ANOVA tests
+summary.aov(nbaMan)</code></pre>
+<pre><code>##  Response GP :
+##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## POSITION      6   4382  730.25  1.4659  0.189
+## Residuals   353 175855  498.17               
+## 
+##  Response MPG :
+##              Df  Sum Sq Mean Sq F value   Pr(&gt;F)    
+## POSITION      6  2040.5  340.08  4.6108 0.000159 ***
+## Residuals   353 26036.8   73.76                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response RPM :
+##              Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## POSITION      6  167.26 27.8760  4.7233 0.0001212 ***
+## Residuals   353 2083.32  5.9018                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response WINS :
+##              Df Sum Sq Mean Sq F value  Pr(&gt;F)  
+## POSITION      6  242.2  40.359  2.8133 0.01095 *
+## Residuals   353 5064.2  14.346                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>nba%&gt;%group_by(POSITION)%&gt;%summarize(mean(GP),mean(MPG),mean(RPM),mean(WINS))</code></pre>
+<pre><code>## # A tibble: 7 x 5
+##   POSITION `mean(GP)` `mean(MPG)` `mean(RPM)` `mean(WINS)`
+##   &lt;fct&gt;         &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
+## 1 &quot; C&quot;           59.1        20.2      0.0122        3.18 
+## 2 &quot; F&quot;           48.4        12.6     -2.92         -0.271
+## 3 &quot; G&quot;           36.2        11.8     -2.34          0.365
+## 4 &quot; PF&quot;          58.7        20.3     -0.221         3.17 
+## 5 &quot; PG&quot;          56.9        23.1     -0.988         2.85 
+## 6 &quot; SF&quot;          60.8        24.0     -0.135         3.93 
+## 7 &quot; SG&quot;          58.9        22.1     -1.34          2.18</code></pre>
+<pre class="r"><code># 21 x 4 = 84 post hoc t-tests
+pairwise.t.test(nba$GP,nba$POSITION, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  nba$GP and nba$POSITION 
+## 
+##      C     F     G     PF    PG    SF  
+##  F  0.179 -     -     -     -     -    
+##  G  0.016 0.297 -     -     -     -    
+##  PF 0.917 0.194 0.018 -     -     -    
+##  PG 0.557 0.287 0.030 0.621 -     -    
+##  SF 0.695 0.126 0.011 0.617 0.332 -    
+##  SG 0.957 0.180 0.016 0.955 0.564 0.637
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(nba$MPG,nba$POSITION, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  nba$MPG and nba$POSITION 
+## 
+##      C       F       G       PF      PG      SF    
+##  F  0.01275 -       -       -       -       -      
+##  G  0.02203 0.86367 -       -       -       -      
+##  PF 0.94244 0.01111 0.01992 -       -       -      
+##  PG 0.05855 0.00063 0.00220 0.06252 -       -      
+##  SF 0.01636 0.00023 0.00100 0.01722 0.52185 -      
+##  SG 0.18876 0.00166 0.00471 0.20377 0.49283 0.19159
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(nba$RPM,nba$POSITION, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  nba$RPM and nba$POSITION 
+## 
+##      C       F       G       PF      PG      SF    
+##  F  0.00079 -       -       -       -       -      
+##  G  0.02384 0.65271 -       -       -       -      
+##  PF 0.58272 0.00186 0.04081 -       -       -      
+##  PG 0.01790 0.02522 0.19030 0.06249 -       -      
+##  SF 0.74101 0.00154 0.03506 0.84547 0.05033 -      
+##  SG 0.00088 0.06417 0.32852 0.00463 0.36733 0.00413
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(nba$WINS,nba$POSITION, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  nba$WINS and nba$POSITION 
+## 
+##      C      F      G      PF     PG     SF   
+##  F  0.0109 -      -      -      -      -     
+##  G  0.0827 0.7502 -      -      -      -     
+##  PF 0.9862 0.0108 0.0828 -      -      -     
+##  PG 0.6121 0.0205 0.1239 0.6162 -      -     
+##  SF 0.2831 0.0022 0.0291 0.2658 0.1113 -     
+##  SG 0.1129 0.0652 0.2564 0.1078 0.2738 0.0076
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code># bonferroni correction is 0.05/89 = 0.0005618</code></pre>
+<p>A MANOVA test was conducted to determine the effect of the Position played (C,F,G,PF,PG,SF) on 4 dependent variables (GP,MPG,RPM,WINS). The null hypothesis is that for GP, MPG, RPM, and WINS, the means of each Position played are equal. The alternate hypothesis is that for at least one of the numeric variables, at least one Position mean is different. Both assumptions of multivariate normality and equal variances were met. Significant differences were found among the 6 positions on the 4 dependent variables, Pillai trace = 0.24, F(24,1412) = 3.76, p &lt; 0.0001. Because it is significant, I ran 4 univariate ANOVAs to see which variables were significant. All together, there was 1 MANOVA, 4 ANOVAs, and 84 t-tests for a total of 89 tests. Using the bonferroni adjustment, the significance level was adjusted to yield a value of 0.05/89 or 0.00056. This means that the probability of making at least one type 1 error is 0.00056. The univariate ANOVAs for MPG and RPM were significant, F(6,353) = 4.61, p &lt; 0.0001, and F(6,353) = 4.72, p &lt; 0.0001, respectively.
+Post hoc analysis was also performed by conducting pairwise t-tests to determine which position specifically differed in MPG, RPM, GP, and WINS. The positions of PG and F along with SF and F differ in minutes per game (MPG) while the positions SG and C differ significantly from each other in terms of real plus minus (RPM) after adjusting for bonferroni.</p>
+</div>
+<div id="randomization-test" class="section level2">
+<h2>2. Randomization test</h2>
+<pre class="r"><code># null: MPG is the same for players who played majority of the season and those who did not
+# alternate: MPG is for different players who played majority of the season and those who did not
+
+ggplot(nba,aes(MPG,fill=MSP))+geom_histogram(bins=6.5)+facet_wrap(~MSP,ncol=2)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code># original mean difference 
+nba%&gt;%group_by(MSP)%&gt;%summarize(means=mean(MPG))%&gt;%summarize(diff(means)) %&gt;% glimpse() </code></pre>
+<pre><code>## Observations: 1
+## Variables: 1
+## $ `diff(means)` &lt;dbl&gt; 12.44988</code></pre>
+<pre class="r"><code># Randomization test
+nba_diff&lt;-vector()
+for(i in 1:5000){
+new1&lt;-data.frame(MPG=sample(nba$MPG),MSP=nba$MSP)
+nba_diff[i]&lt;-mean(new1[new1$MSP==&quot;True&quot;,]$MPG)-
+ mean(new1[new1$MSP==&quot;False&quot;,]$MPG) }
+
+# p value for 2 way t test
+mean(nba_diff &gt; 12.44988)*2</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>{hist(nba_diff,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = 12.44988,col=&quot;red&quot;)}</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code># independent samples t test for comparison 
+t.test(data=nba,MPG~MSP)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  MPG by MSP
+## t = -14.675, df = 148.57, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -14.12634 -10.77343
+## sample estimates:
+## mean in group False  mean in group True 
+##            12.01412            24.46400</code></pre>
+<p>Null hypothesis: Minutes per game (MPG) is the same for players who played the majority of the season and those who did not (MSP).
+Alternative: MPG is different for players who played the majority of the season and those who didn’t.</p>
+<p>A randomization distribution test was performed to determine if the difference in mean MPG for players who played the majority of the season versus those who did not was significant. The original mean difference was 12.450 minutes. The p value or probability of observing a mean difference as extreme as 12.450 minutes was equal to 0. In comparison, when an independent samples t-test was performed, the p value was also very close to 0 with a value of 2.2 x 10^-16. Thus, we can reject the null hypothesis and determine that a player’s minutes per game (MPG) are significantly different for someone who played the majority of the season versus someone who did not.</p>
+</div>
+<div id="linear-regression-model" class="section level2">
+<h2>3. Linear Regression Model</h2>
+<pre class="r"><code># predicting RPM from MPG and GP
+# first center numeric variables MPG and GP
+nba$MPG_c &lt;- nba$MPG - mean(nba$MPG, na.rm=T)
+nba$GP_c &lt;- nba$GP - mean(nba$GP, na.rm=T)
+
+# multiple regression with interaction
+nbafit&lt;-lm(RPM ~ GP_c * MPG_c, data=nba)
+summary(nbafit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = RPM ~ GP_c * MPG_c, data = nba)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.5525 -1.1770 -0.0064  1.0164  7.3138 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.1070387  0.1310708  -8.446 7.76e-16 ***
+## GP_c         0.0158416  0.0070854   2.236    0.026 *  
+## MPG_c        0.1581160  0.0159572   9.909  &lt; 2e-16 ***
+## GP_c:MPG_c   0.0032277  0.0005912   5.459 8.98e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.016 on 356 degrees of freedom
+## Multiple R-squared:  0.357,  Adjusted R-squared:  0.3516 
+## F-statistic: 65.88 on 3 and 356 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># plot for numeric by numeric interaction
+library(stats)
+new1&lt;-nba
+new1$GP_c&lt;-mean(nba$GP_c)
+new1$mean&lt;-predict(nbafit,new1)
+new1$GP_c&lt;-mean(nba$GP_c)+sd(nba$GP_c)
+new1$plus.sd&lt;-predict(nbafit,new1)
+new1$GP_c&lt;-mean(nba$GP_c)-sd(nba$GP_c)
+new1$minus.sd&lt;-predict(nbafit,new1)
+newint&lt;-new1%&gt;%select(RPM,MPG_c,mean,plus.sd,minus.sd)%&gt;%gather(Age,value,-RPM,-MPG_c)
+
+mycols&lt;-c(&quot;#619CFF&quot;,&quot;#F8766D&quot;,&quot;#00BA38&quot;)
+names(mycols)&lt;-c(&quot;-1 sd&quot;,&quot;mean&quot;,&quot;+1 sd&quot;)
+mycols=as.factor(mycols)
+
+ggplot(nba,aes(MPG_c,RPM),group=mycols)+geom_point()+geom_line(data=new1,aes(y=mean,color=&quot;mean&quot;))+geom_line(data=new1,aes(y=plus.sd,color=&quot;+1 sd&quot;))+geom_line(data=new1,aes(y=minus.sd,color=&quot;-1 sd&quot;))+scale_color_manual(values=mycols)+labs(color=&quot;Games Played&quot;)+theme(legend.position=c(.9,.2))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code># Assumptions (linearity, homoskedaskity)
+resids&lt;-nbafit$residuals
+fitvals&lt;-nbafit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code># Assumption (normality)
+ggplot()+geom_histogram(aes(resids), bins=20)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<pre class="r"><code>ggplot()+geom_qq(aes(sample=resids))+geom_qq_line(aes(sample=resids), color=&#39;red&#39;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-4.png" width="672" /></p>
+<pre class="r"><code># uncorrected standard errors 
+summary(nbafit)$coef[,1:2]</code></pre>
+<pre><code>##                 Estimate   Std. Error
+## (Intercept) -1.107038698 0.1310708153
+## GP_c         0.015841630 0.0070853889
+## MPG_c        0.158115975 0.0159572461
+## GP_c:MPG_c   0.003227747 0.0005912284</code></pre>
+<pre class="r"><code># regression with robust standard errors 
+library(sandwich)
+library(lmtest)</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre class="r"><code>coeftest(nbafit, vcov = vcovHC(nbafit))[,1:2]</code></pre>
+<pre><code>##                 Estimate   Std. Error
+## (Intercept) -1.107038698 0.1362728283
+## GP_c         0.015841630 0.0076170692
+## MPG_c        0.158115975 0.0183624617
+## GP_c:MPG_c   0.003227747 0.0005900993</code></pre>
+<pre class="r"><code># same regression model without interaction
+nbafit2&lt;-lm(RPM ~ GP_c + MPG_c, data=nba)
+summary(nbafit2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = RPM ~ GP_c + MPG_c, data = nba)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.4020 -1.3341  0.0683  1.1681  7.0277 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.688139   0.110468  -6.229 1.32e-09 ***
+## GP_c        -0.001882   0.006547  -0.287    0.774    
+## MPG_c        0.158969   0.016588   9.584  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.096 on 357 degrees of freedom
+## Multiple R-squared:  0.3031, Adjusted R-squared:  0.2992 
+## F-statistic: 77.65 on 2 and 357 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># likelihood ratio test </code></pre>
+<p>Null: While controlling for minutes per game (MPG), the number of games (GP) played does not explain variation in RPM.
+Null: While controlling for the number of games played (GP), MPG does not explain variation in RPM.</p>
+<p>The intercept of -1.107 is the predicted value of RPM when GP and MPG are equal to 0. The coefficient for GP_c of 0.0158 is the slope for GP on RPM while holding MPG constant. On the other hand, 0.158 is the slope for MPG on RPM while holding GP constant. After mean centering both numeric variables of GP and MPG, the interaction coefficient of 0.0032 is the slope for games played (GP) on RPM based on varying levels of minutes per game (MPG).</p>
+<p>For the assumptions, the homoskedasticity assumption was met since the plot shows most of the points fairly equidistant from the regression line (in red). Also, the normality assumption was met since the histogram shows a distribution that closely resembles a normal distribution. The residuals plot also shows the dots in close proximity to the line of residuals.</p>
+<p>When running the regression with robust standard errors, the robust SEs were slightly larger than the uncorrected SE values. The robust SE for GP_c was 0.0076 compared to 0.0071, while the robust SE for MPG_c was 0.0184 compared to 0.0159. The robust SEs should be used since they are corrrected and robust to violations of heteroskedasticity.</p>
+<p>The R^2 value from summary(nbafit) is the proportion of variation in RPM explained by the overall model ‘nbafit’ was 0.3516. This means that my model explains 35.16% of the variation in RPM. Compared to model with interaction, the model without interaction has a lower coefficient value for GP_c of -0.0019, meaning that the slope for GP on RPM while holding MPG constant is negative. The intercept coefficient is slightly higher, and the coefficient for MPG_c is almost identical at 0.159.</p>
+</div>
+<div id="bootstrapped-standard-errors" class="section level2">
+<h2>4. Bootstrapped standard errors</h2>
+<pre class="r"><code># bootstrapped standard errors for same interaction model as above
+boot_dat&lt;-nba[sample(nrow(nba),replace=TRUE),]
+samp_boot&lt;-replicate(5000, {
+ boot_dat&lt;-boot_dat[sample(nrow(boot_dat),replace=TRUE),]
+ fit&lt;-lm(RPM ~ GP_c * MPG_c, data=boot_dat)
+ coef(fit)
+})
+samp_boot%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept)        GP_c      MPG_c   GP_c:MPG_c
+## 1   0.1180515 0.006537733 0.01628674 0.0006136533</code></pre>
+<p>Compared to the original and robust standard errors, the bootstrapped standard errors are slightly larger than the original and slightly smaller than the robust SEs. The intercept SE was highest for the bootstrapped model with 0.140 and smallest for the original model with a value of 0.131.</p>
+</div>
+<div id="logistic-regression" class="section level2">
+<h2>5. Logistic Regression</h2>
+<pre class="r"><code>library(ggplot2)
+# make binary variable &quot;y&quot; which corresponds to MSP (Majority of season played); if player played in &gt; 41 games then T or 1; else F or 0
+nba$MSP&lt;-ifelse(nba$GP &gt;= 41, &quot;True&quot;, &quot;False&quot;)
+nba %&gt;% count(MSP)</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   MSP       n
+##   &lt;chr&gt; &lt;int&gt;
+## 1 False    85
+## 2 True    275</code></pre>
+<pre class="r"><code>nba$y&lt;-ifelse(nba$MSP==&quot;True&quot;,1,0)
+
+# logistic regression: predict y from Position and RPM
+nbaLogFit&lt;-glm(y~POSITION+RPM, data=nba, family=binomial(link = &quot;logit&quot;))
+summary(nbaLogFit)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ POSITION + RPM, family = binomial(link = &quot;logit&quot;), 
+##     data = nba)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2849   0.1915   0.5439   0.7680   1.5731  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.51370    0.33088   4.575 4.77e-06 ***
+## POSITION F  -0.69580    0.76874  -0.905    0.365    
+## POSITION G  -1.37116    0.93397  -1.468    0.142    
+## POSITION PF  0.10689    0.44968   0.238    0.812    
+## POSITION PG  0.15286    0.44479   0.344    0.731    
+## POSITION SF -0.13355    0.46327  -0.288    0.773    
+## POSITION SG  0.51799    0.43843   1.181    0.237    
+## RPM          0.35885    0.07223   4.968 6.77e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 393.52  on 359  degrees of freedom
+## Residual deviance: 351.09  on 352  degrees of freedom
+## AIC: 367.09
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>coeftest(nbaLogFit)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##              Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)  1.513701   0.330883  4.5747 4.768e-06 ***
+## POSITION F  -0.695802   0.768740 -0.9051    0.3654    
+## POSITION G  -1.371156   0.933970 -1.4681    0.1421    
+## POSITION PF  0.106885   0.449684  0.2377    0.8121    
+## POSITION PG  0.152862   0.444789  0.3437    0.7311    
+## POSITION SF -0.133546   0.463271 -0.2883    0.7731    
+## POSITION SG  0.517988   0.438434  1.1814    0.2374    
+## RPM          0.358845   0.072233  4.9679 6.769e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># exponentiated coefficients (odds scale)
+exp(coef(nbaLogFit)) %&gt;% round(3)%&gt;%t</code></pre>
+<pre><code>##      (Intercept) POSITION F POSITION G POSITION PF POSITION PG POSITION SF
+## [1,]       4.544      0.499      0.254       1.113       1.165       0.875
+##      POSITION SG   RPM
+## [1,]       1.679 1.432</code></pre>
+<pre class="r"><code># confusion matrix 
+probPlay&lt;-predict(nbaLogFit, type = &quot;response&quot;)
+pred&lt;-ifelse(probPlay&gt;.5,1,0)
+table(truth=nba$y, prediction=pred)%&gt;%addmargins</code></pre>
+<pre><code>##      prediction
+## truth   0   1 Sum
+##   0     9  76  85
+##   1    12 263 275
+##   Sum  21 339 360</code></pre>
+<pre class="r"><code>(263+9)/360   # accuracy</code></pre>
+<pre><code>## [1] 0.7555556</code></pre>
+<pre class="r"><code>9/85          # specificity (tnr)</code></pre>
+<pre><code>## [1] 0.1058824</code></pre>
+<pre class="r"><code>263/275       # sensitivity (tpr)</code></pre>
+<pre><code>## [1] 0.9563636</code></pre>
+<pre class="r"><code>263/339       # precision or recall (ppv)</code></pre>
+<pre><code>## [1] 0.7758112</code></pre>
+<pre class="r"><code># logit plot
+ggplot(nba, aes(y,probPlay)) + geom_point(aes(color = nba$y))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># ROC plot
+library(plotROC)
+ROCplot&lt;- ggplot(nba) + geom_roc(aes(d=y, m=probPlay), n.cuts = 0) +
+ geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2) 
+ROCplot</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.7272299</code></pre>
+<pre class="r"><code># 10 fold CV
+set.seed(1234)
+k=10
+nba1&lt;- nba[sample(nrow(nba)),]
+folds&lt;- cut(seq(1:nrow(nba)), breaks=k, labels=F)
+
+diags&lt;-NULL
+for(i in 1:k){
+ nbaCV&lt;-nba1[folds!=i,]
+ test&lt;-nba1[folds==i,]
+ truth&lt;-test$y
+ fit&lt;-glm(y~POSITION+RPM, data=nbaCV,family=&quot;binomial&quot;)
+ probs&lt;-predict(fit,newdata = test,type=&quot;response&quot;)
+ ## Test model on test set (save all k results)
+ diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+apply(diags,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.7444444 0.9472224 0.1095971 0.7734265 0.7061260</code></pre>
+<p>After running a logistic regression to predict if a player played the majority of the season (y) based on Position played and his RPM, the exponentiated coefficients were interpreted.
+Intercept: 4.544 is the odds of a player to play the majority of the season for someone with RPM = 0 and who plays the “C” or center position since that is the reference group.
+RPM: 1 additional point increase in RPM increases odds that a player plays the majority of the season by a factor of 1.432 while controlling for Position.
+POSITION F: The odds for someone playing the generic Forward position to play a majority of the season are 0.499 times the odds for someone playing the Center position while controlling for RPM.
+POSITION G: The odds for someone playing the generic Guard position are 0.254 times the odds for someone playing “C” Position while controlling for RPM.
+POSITION PF: The odds for someone playing the Power Forward position are 1.113 times the odds for someone playing “C” Position while controlling for RPM.
+POSITION PG: The odds for someone playing the Point Guard position are 1.165 times the odds for someone playing “C” Position to play the majority of the season while controlling for RPM.
+POSITION SF: The odds for someone playing the Small Forward position to play the majority of the season are 0.875 times the odds for someone playing “C” Position while controlling for RPM.
+POSITION SG: The odds for someone playing the Shooting Guard position to play the majority of the season are 1.679 times the odds for someone playing “C” Position while controlling for RPM.</p>
+<p>A confusion matrix was produced in order to determine and compute the values of accuracy, sensitivity, specificity, and recall. The sensitivity or true positive rate was 263/275 or 0.956, which is the probability of correctly determining if a player played the majority of the season if they really did. The specificity or true negative rate was 9/85 or 0.106. Recall or PPV was determined to be 263/339 or 0.776, which is the proportion of those classified as majority season players who actually did play the majority. Lastly, the Accuracy was calculated to be (263+9)/360 or 0.756.</p>
+<p>Based on the ROC plot and calculated AUC value of 0.727, the model is considered fair. This means that it is relatively difficult to predict if a player played the majority of a season (MSP) from just Position and Real Plus Minus (RPM).</p>
+<p>After running a 10 fold CV, the average out of sample Accuracy was determined to be 0.75, the Sensitivity was 0.947, and the Recall or PPV was 0.774. Compared to the AUC value generated by the ROC curve of 0.727, the AUC after running a 10 fold CV was slightly smaller with a value of 0.712. However, this still means that the model is in the “fair” range at predicting if a player played the majority of the season.</p>
+</div>
+<div id="lasso-regression" class="section level2">
+<h2>6. LASSO Regression</h2>
+<pre class="r"><code># generating model that predicts y from all other variables
+nbaNew&lt;- nba %&gt;% select(GP,MPG,ORPM,DRPM,RPM,WINS,SALARY,POSITION,y)
+nbaAll&lt;-glm(y~. , data = nbaNew, family = &quot;binomial&quot;)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code># LASSO regression predicting y from all other variables in nba dataset
+install.packages(&quot;glmnet&quot;)</code></pre>
+<pre><code>## 
+##   There is a binary version available but the source version is later:
+##        binary source needs_compilation
+## glmnet  3.0-1  3.0-2              TRUE</code></pre>
+<pre><code>## installing the source package &#39;glmnet&#39;</code></pre>
+<pre><code>## Warning in install.packages(&quot;glmnet&quot;): installation of package &#39;glmnet&#39; had non-
+## zero exit status</code></pre>
+<pre class="r"><code>library(glmnet)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## Loaded glmnet 3.0-1</code></pre>
+<pre class="r"><code>set.seed(1234)
+x&lt;-model.matrix(nbaAll)
+x&lt;-x[,-1]%&gt;%scale%&gt;%as.matrix
+y&lt;-as.matrix(nbaNew$y)
+cv&lt;-cv.glmnet(x,y,family=&#39;binomial&#39;)
+lasso&lt;-glmnet(x,y,family=&#39;binomial&#39;,lambda=cv$lambda.1se)
+coef(cv)</code></pre>
+<pre><code>## 14 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                       1
+## (Intercept)  6.93951257
+## GP           8.72736620
+## MPG          0.47414733
+## ORPM         .         
+## DRPM         .         
+## RPM          .         
+## WINS         .         
+## SALARY       .         
+## POSITION F  -0.01865888
+## POSITION G  -0.01527324
+## POSITION PF  0.33167661
+## POSITION PG -0.10135228
+## POSITION SF -0.09779853
+## POSITION SG  0.09901493</code></pre>
+<pre class="r"><code># 10 fold CV using LASSO model
+set.seed(1234)
+k=10
+nbaLass&lt;- nba %&gt;% select(GP,MPG,POSITION,y) 
+data2&lt;- nbaLass[sample(nrow(nbaLass)),]
+folds&lt;- cut(seq(1:nrow(nbaLass)), breaks=k, labels=F)
+
+diags&lt;-NULL
+for(i in 1:k){
+ nbaLassCV&lt;-data2[folds!=i,]
+ test&lt;-data2[folds==i,]
+ truth&lt;-test$y
+ fit&lt;-glm(y~.,data=nbaLassCV,family=&quot;binomial&quot;)
+ probs&lt;-predict(fit,newdata = test,type=&quot;response&quot;)
+ ## Test model on test set (save all k results)
+ diags&lt;-rbind(diags,class_diag(probs,truth))
+}</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>apply(diags,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.9750000 0.9823297 0.9556410 0.9853571 0.9873686</code></pre>
+<p>The variables retained after performing a LASSO regression were GP, MPG, and POSITION_F,G,PF,PG,SF, and SG since they all had non-zero coefficients. Compared to the full model in terms of out-of-sample prediction, the LASSO model has a significantly higher AUC value of 0.989. This means that the LASSO 10 fold CV model is a “great” predictor compared to just “fair”. Since the response was binary, the Accuracy was also looked at compared to the full model. While the logistic regression model had an accuracy of 0.750, the LASSO model had a much higher out-of-sample accuracy value of 0.981. Thus, this model does a much better job at predicting whether a player played the majority of the season based on his MPG, GP, and Position played.</p>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

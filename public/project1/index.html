@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wasim Meghani" />
+    <meta name="description" content="Describe your website">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.60.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="wasim-meghani-wam2233" class="section level2">
+<h2>Wasim Meghani, wam2233</h2>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>For as long as I can remember, basketball has always been a sport that I have enjoyed playing and watching on TV. It requires endless hours of practicing in order to perfect, and athletes who end up making the National Basketball Association (NBA) have been studying and playing the game their entire lives. One measure of analytics to determine the efficiency of a player on the court is the real plus minus (RPM). RPM is the player’s average impact in terms of net point differential per 100 offensive and defensive possesions, and is the sum of the ORPM and DRPM.</p>
+<p>For my datasets, I decided to use data from the NBA to explore the efficiency ratings of various players and the correlation with their respective salaries. One of my datasets titled ‘rpm’ contains NBA player names, number of games played, position, team, and their ORPM, DRPM, and RPM values for the entire 2017 season. The other dataset named ‘salary’ contains the annual salary for NBA players from 2017 season along with their team names and position. Both these datasets were found on Kaggle, and are interesting to me due to my love for the game of basketball. If real plus minus is truly an accurate measure of player efficiency, it should indeed translate over to the player’s annual salary. This data can be used to determine the correlation between RPM and salary based on the player’s position, team, and number of games played.</p>
+<div id="untidying-and-tidying-data" class="section level3">
+<h3>1. Untidying and Tidying data</h3>
+<pre class="r"><code>rpm &lt;- read.csv(&quot;/Users/Wasim/Desktop/website/content/nba_2017_real_plus_minus.csv&quot;)
+salary &lt;- read.csv(&quot;/Users/Wasim/Desktop/website/content/nba_2017_salary.csv&quot;)
+
+glimpse(rpm)</code></pre>
+<pre><code>## Observations: 468
+## Variables: 8
+## $ NAME &lt;fct&gt; &quot;LeBron James, SF&quot;, &quot;Stephen Curry, PG&quot;, &quot;Jimmy Butler, SG&quot;, &quot;Ru…
+## $ TEAM &lt;fct&gt; CLE, GS, CHI, OKC, GS, UTAH, HOU, SA, LAC, DEN, MIL, NO, TOR, LA…
+## $ GP   &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 60, 81, 62, 69, …
+## $ MPG  &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9, 35.6…
+## $ ORPM &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44, 2.35…
+## $ DRPM &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.29, 1.…
+## $ RPM  &lt;dbl&gt; 8.42, 7.41, 6.62, 6.27, 7.14, 6.37, 4.81, 7.08, 7.92, 6.73, 4.21…
+## $ WINS &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13.48, 1…</code></pre>
+<pre class="r"><code>glimpse(salary)</code></pre>
+<pre><code>## Observations: 449
+## Variables: 4
+## $ NAME     &lt;fct&gt; LeBron James, Mike Conley, Al Horford, Dirk Nowitzki, Carmel…
+## $ POSITION &lt;fct&gt;  SF,  PG,  C,  PF,  SF,  PG,  PF,  SG,  C,  PG,  SF,  SG,  P…
+## $ TEAM     &lt;fct&gt; Cleveland Cavaliers, Memphis Grizzlies, Boston Celtics, Dall…
+## $ SALARY   &lt;dbl&gt; 30963450, 26540100, 26540100, 25000000, 24559380, 24328425, …</code></pre>
+<pre class="r"><code>untidy_rpm&lt;- rpm %&gt;% 
+  separate(&quot;NAME&quot;, into = c(&quot;NAME&quot;,&quot;POSITION&quot;), sep = &quot;,&quot;) %&gt;%
+  pivot_wider(names_from = &quot;POSITION&quot;, values_from = &quot;RPM&quot;) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 468
+## Variables: 14
+## $ NAME  &lt;chr&gt; &quot;LeBron James&quot;, &quot;Stephen Curry&quot;, &quot;Jimmy Butler&quot;, &quot;Russell Westb…
+## $ TEAM  &lt;fct&gt; CLE, GS, CHI, OKC, GS, UTAH, HOU, SA, LAC, DEN, MIL, NO, TOR, L…
+## $ GP    &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 60, 81, 62, 69,…
+## $ MPG   &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9, 35.…
+## $ ORPM  &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44, 2.3…
+## $ DRPM  &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.29, 1…
+## $ WINS  &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13.48, …
+## $ ` SF` &lt;dbl&gt; 8.42, NA, NA, NA, NA, NA, NA, 7.08, NA, NA, 4.21, NA, NA, NA, 5…
+## $ ` PG` &lt;dbl&gt; NA, 7.41, NA, 6.27, NA, NA, NA, NA, 7.92, NA, NA, NA, 5.88, NA,…
+## $ ` SG` &lt;dbl&gt; NA, NA, 6.62, NA, NA, NA, 4.81, NA, NA, NA, NA, NA, NA, NA, NA,…
+## $ ` PF` &lt;dbl&gt; NA, NA, NA, NA, 7.14, NA, NA, NA, NA, NA, NA, 4.35, NA, NA, NA,…
+## $ ` C`  &lt;dbl&gt; NA, NA, NA, NA, NA, 6.37, NA, NA, NA, 6.73, NA, NA, NA, 4.55, N…
+## $ ` G`  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+## $ ` F`  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</code></pre>
+<pre class="r"><code>tidy_rpm&lt;- untidy_rpm %&gt;%
+  pivot_longer(c(&quot; SF&quot;,&quot; SG&quot;,&quot; C&quot;,&quot; PG&quot;,&quot; PF&quot;,&quot; G&quot;,&quot; F&quot;),names_to = &quot;POSITION&quot;,values_to = &quot;RPM&quot;)%&gt;%
+  na.omit %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 468
+## Variables: 9
+## $ NAME     &lt;chr&gt; &quot;LeBron James&quot;, &quot;Stephen Curry&quot;, &quot;Jimmy Butler&quot;, &quot;Russell We…
+## $ TEAM     &lt;fct&gt; CLE, GS, CHI, OKC, GS, UTAH, HOU, SA, LAC, DEN, MIL, NO, TOR…
+## $ GP       &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 60, 81, 62, …
+## $ MPG      &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9, …
+## $ ORPM     &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44, …
+## $ DRPM     &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.29…
+## $ WINS     &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13.4…
+## $ POSITION &lt;chr&gt; &quot; SF&quot;, &quot; PG&quot;, &quot; SG&quot;, &quot; PG&quot;, &quot; PF&quot;, &quot; C&quot;, &quot; SG&quot;, &quot; SF&quot;, &quot; PG&quot;…
+## $ RPM      &lt;dbl&gt; 8.42, 7.41, 6.62, 6.27, 7.14, 6.37, 4.81, 7.08, 7.92, 6.73, …</code></pre>
+<pre class="r"><code>untidy_sal&lt;-salary %&gt;%
+  pivot_wider(names_from = POSITION , values_from = SALARY) %&gt;% glimpse()</code></pre>
+<pre><code>## Warning: Values in `SALARY` are not uniquely identified; output will contain list-cols.
+## * Use `values_fn = list(SALARY = list)` to suppress this warning.
+## * Use `values_fn = list(SALARY = length)` to identify where the duplicates arise
+## * Use `values_fn = list(SALARY = summary_fun)` to summarise duplicates</code></pre>
+<pre><code>## Observations: 441
+## Variables: 11
+## $ NAME  &lt;fct&gt; LeBron James, Mike Conley, Al Horford, Dirk Nowitzki, Carmelo A…
+## $ TEAM  &lt;fct&gt; Cleveland Cavaliers, Memphis Grizzlies, Boston Celtics, Dallas …
+## $ ` SF` &lt;list&lt;dbl&gt;&gt; 30963450, NULL, NULL, NULL, 24559380, NULL, NULL, NULL, N…
+## $ ` PG` &lt;list&lt;dbl&gt;&gt; NULL, 26540100, NULL, NULL, NULL, 24328425, NULL, NULL, N…
+## $ ` C`  &lt;list&lt;dbl&gt;&gt; NULL, NULL, 26540100, NULL, NULL, NULL, NULL, NULL, 23180…
+## $ ` PF` &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, 2.5e+07, NULL, NULL, 23741060, NULL, NU…
+## $ ` SG` &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, NULL, NULL, NULL, NULL, 23200000, NULL,…
+## $ ` F`  &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NUL…
+## $ ` G`  &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NUL…
+## $ PG    &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NUL…
+## $ SF    &lt;list&lt;dbl&gt;&gt; NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NUL…</code></pre>
+<p>Since both the datasets were initially tidy, I had to use pivot_wider to untidy them. For the dataset titled ‘rpm’, the player names and respective position were in the same column. I used the separate() function to split name and position into 2 individual columns, and then used pivot_wider to spread out the various positions into 7 distinct columns. The values for these 7 new ‘position’ variables came from the RPM values, which essentially got rid of the RPM column and spread its values across the 7 positions columns depending on the player’s position.</p>
+<p>To retidy the data, I used pivot_longer to select each of the 7 newly created position variables (SF, SG, PG, C, P, F, PF) and compress them into a single variable named POSITION. The RPM values associated with the player and position were moved to a column called RPM, and any NAs were omitted from the dataset. This allowed for each observation to have its own row, meaning that the data was tidy.</p>
+<p>The same process was used for the dataset titled ‘salary’. Pivot_wider was used to untidy the data by spreading out the positions into 7 distinct columns, where the player’s salary value was inserted into the corresponding player’s box. Then, pivot_longer was used to retidy the data by compressing the positions into a single variable called POSITION, and the salary values were returned to the variable SALARY.</p>
+</div>
+<div id="joining-datasets" class="section level3">
+<h3>2. Joining datasets</h3>
+<pre class="r"><code>joindata&lt;-inner_join(tidy_rpm,salary, by=&quot;NAME&quot;) %&gt;% glimpse()</code></pre>
+<pre><code>## Warning: Column `NAME` joining character vector and factor, coercing into
+## character vector</code></pre>
+<pre><code>## Observations: 360
+## Variables: 12
+## $ NAME       &lt;chr&gt; &quot;LeBron James&quot;, &quot;Stephen Curry&quot;, &quot;Jimmy Butler&quot;, &quot;Russell …
+## $ TEAM.x     &lt;fct&gt; CLE, GS, CHI, OKC, GS, UTAH, HOU, SA, LAC, DEN, MIL, NO, G…
+## $ GP         &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 62, 69, 72…
+## $ MPG        &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9…
+## $ ORPM       &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44…
+## $ DRPM       &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.…
+## $ WINS       &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13…
+## $ POSITION.x &lt;chr&gt; &quot; SF&quot;, &quot; PG&quot;, &quot; SG&quot;, &quot; PG&quot;, &quot; PF&quot;, &quot; C&quot;, &quot; SG&quot;, &quot; SF&quot;, &quot; P…
+## $ RPM        &lt;dbl&gt; 8.42, 7.41, 6.62, 6.27, 7.14, 6.37, 4.81, 7.08, 7.92, 6.73…
+## $ POSITION.y &lt;fct&gt;  SF,  PG,  SG, PG,  PF,  C, PG,  SF,  PG,  C,  SF,  PF, SF…
+## $ TEAM.y     &lt;fct&gt; Cleveland Cavaliers, Golden State Warriors, Chicago Bulls,…
+## $ SALARY     &lt;dbl&gt; 30963450, 12112359, 17552209, 26500000, 15330435, 2121288,…</code></pre>
+<p>I used inner_join() to combine both my datasets because I wanted to ensure my final datasets had no NAs. In order for the final dataset to have a salary and RPM value for each player, I chose a join that would give me players which both datasets had in common. As a result, the final dataset ‘joindata’ contained 360 total observations. This means that 108 players were lost from the RPM dataset and 89 players were lost from the salary dataset. Since some of these players may have gotten injured during the season, retired, or benched through much of the season, the missing cases will not negatively affect further data exploration.</p>
+</div>
+<div id="wrangling" class="section level3">
+<h3>3. Wrangling</h3>
+<pre class="r"><code># Removes redunant variables POSITION.y and TEAM.x
+joindata %&gt;% select(-c(POSITION.y,TEAM.x)) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 360
+## Variables: 10
+## $ NAME       &lt;chr&gt; &quot;LeBron James&quot;, &quot;Stephen Curry&quot;, &quot;Jimmy Butler&quot;, &quot;Russell …
+## $ GP         &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 62, 69, 72…
+## $ MPG        &lt;dbl&gt; 37.8, 33.4, 37.0, 34.6, 32.5, 33.9, 36.4, 33.4, 31.5, 27.9…
+## $ ORPM       &lt;dbl&gt; 6.49, 7.27, 4.82, 6.74, 1.55, 0.35, 6.38, 5.83, 5.16, 4.44…
+## $ DRPM       &lt;dbl&gt; 1.93, 0.14, 1.80, -0.47, 5.59, 6.02, -1.57, 1.25, 2.76, 2.…
+## $ WINS       &lt;dbl&gt; 20.43, 18.80, 17.35, 17.34, 16.84, 15.55, 15.54, 15.53, 13…
+## $ POSITION.x &lt;chr&gt; &quot; SF&quot;, &quot; PG&quot;, &quot; SG&quot;, &quot; PG&quot;, &quot; PF&quot;, &quot; C&quot;, &quot; SG&quot;, &quot; SF&quot;, &quot; P…
+## $ RPM        &lt;dbl&gt; 8.42, 7.41, 6.62, 6.27, 7.14, 6.37, 4.81, 7.08, 7.92, 6.73…
+## $ TEAM.y     &lt;fct&gt; Cleveland Cavaliers, Golden State Warriors, Chicago Bulls,…
+## $ SALARY     &lt;dbl&gt; 30963450, 12112359, 17552209, 26500000, 15330435, 2121288,…</code></pre>
+<pre class="r"><code># only shows data for 1 player: KD
+joindata %&gt;% filter(NAME == &quot;Kevin Durant&quot;) </code></pre>
+<pre><code>## # A tibble: 1 x 12
+##   NAME  TEAM.x    GP   MPG  ORPM  DRPM  WINS POSITION.x   RPM POSITION.y TEAM.y
+##   &lt;chr&gt; &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt; 
+## 1 Kevi… GS        62  33.4  4.41  1.33  12.2 &quot; SF&quot;       5.74 SF         Golde…
+## # … with 1 more variable: SALARY &lt;dbl&gt;</code></pre>
+<pre class="r"><code># shows all players/stats on the Mavs
+joindata %&gt;% filter(TEAM.y == &quot;Dallas Mavericks&quot;) %&gt;% arrange(desc(RPM))</code></pre>
+<pre><code>## # A tibble: 7 x 12
+##   NAME  TEAM.x    GP   MPG  ORPM  DRPM  WINS POSITION.x   RPM POSITION.y TEAM.y
+##   &lt;chr&gt; &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt; 
+## 1 Devi… DAL       65  16.7  0.38  0.32  2.58 &quot; PG&quot;       0.7  &quot; PG&quot;      Dalla…
+## 2 Dirk… DAL       54  26.4 -0.38  0.64  3.02 &quot; PF&quot;       0.26 &quot; PF&quot;      Dalla…
+## 3 Wesl… DAL       73  34.2  0.09  0.11  5.06 &quot; SG&quot;       0.2  &quot; SG&quot;      Dalla…
+## 4 Dwig… DAL       77  17.3 -0.66 -0.51  1.58 &quot; PF&quot;      -1.17 &quot; PF&quot;      Dalla…
+## 5 J.J.… DAL       35  22    0.15 -1.57  0.8  &quot; PG&quot;      -1.42 &quot; PG&quot;      Dalla…
+## 6 Pier… DAL        8  10.5 -0.96 -0.76  0.02 &quot; PG&quot;      -1.72 PG         Dalla…
+## 7 Jona… DAL       17  13.6 -1.95 -2.16 -0.15 &quot; PG&quot;      -4.11 &quot; PG&quot;      Dalla…
+## # … with 1 more variable: SALARY &lt;dbl&gt;</code></pre>
+<pre class="r"><code># arranges player names and data by descending salary
+joindata %&gt;% group_by(NAME) %&gt;% arrange(desc(SALARY)) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 360
+## Variables: 12
+## Groups: NAME [353]
+## $ NAME       &lt;chr&gt; &quot;LeBron James&quot;, &quot;Mike Conley&quot;, &quot;Al Horford&quot;, &quot;Russell West…
+## $ TEAM.x     &lt;fct&gt; CLE, MEM, BOS, OKC, HOU, GS, DAL, NY, POR, CHI, ATL, LAC, …
+## $ GP         &lt;int&gt; 74, 69, 68, 81, 81, 62, 54, 74, 75, 60, 74, 61, 75, 77, 34…
+## $ MPG        &lt;dbl&gt; 37.8, 33.2, 32.3, 34.6, 36.4, 33.4, 26.4, 34.3, 35.9, 29.9…
+## $ ORPM       &lt;dbl&gt; 6.49, 4.67, 0.76, 6.74, 6.38, 4.41, -0.38, 1.87, 4.63, -0.…
+## $ DRPM       &lt;dbl&gt; 1.93, -0.20, 1.06, -0.47, -1.57, 1.33, 0.64, -1.75, -1.49,…
+## $ WINS       &lt;dbl&gt; 20.43, 10.50, 6.93, 17.34, 15.54, 12.24, 3.02, 5.26, 10.72…
+## $ POSITION.x &lt;chr&gt; &quot; SF&quot;, &quot; PG&quot;, &quot; C&quot;, &quot; PG&quot;, &quot; SG&quot;, &quot; SF&quot;, &quot; PF&quot;, &quot; SF&quot;, &quot; P…
+## $ RPM        &lt;dbl&gt; 8.42, 4.47, 1.82, 6.27, 4.81, 5.74, 0.26, 0.12, 3.14, -0.9…
+## $ POSITION.y &lt;fct&gt;  SF,  PG,  C, PG, PG, SF,  PF,  SF,  PG,  SG,  C,  PG,  PF…
+## $ TEAM.y     &lt;fct&gt; Cleveland Cavaliers, Memphis Grizzlies, Boston Celtics, Ok…
+## $ SALARY     &lt;dbl&gt; 30963450, 26540100, 26540100, 26500000, 26500000, 26500000…</code></pre>
+<pre class="r"><code># arranges player names and data by ascending RPM (lowest RPM first)
+joindata %&gt;% group_by(NAME) %&gt;% arrange(RPM) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 360
+## Variables: 12
+## Groups: NAME [353]
+## $ NAME       &lt;chr&gt; &quot;Mario Hezonja&quot;, &quot;Wade Baldwin IV&quot;, &quot;Jahlil Okafor&quot;, &quot;Bran…
+## $ TEAM.x     &lt;fct&gt; ORL, MEM, PHI, PHX, WSH, WSH, ORL, LAL, NY, CHI/OKC, SAC, …
+## $ GP         &lt;int&gt; 65, 33, 50, 54, 57, 33, 78, 79, 46, 66, 61, 31, 36, 41, 61…
+## $ MPG        &lt;dbl&gt; 14.8, 12.3, 22.7, 21.1, 12.3, 17.4, 19.7, 28.8, 21.0, 22.8…
+## $ ORPM       &lt;dbl&gt; -4.40, -4.36, -4.43, -2.24, -2.15, -1.64, -1.53, -1.76, -2…
+## $ DRPM       &lt;dbl&gt; -2.20, -1.43, -1.26, -3.08, -3.09, -3.31, -3.40, -2.93, -1…
+## $ WINS       &lt;dbl&gt; -2.09, -0.67, -1.85, -1.63, -0.92, -0.66, -1.74, -2.32, -0…
+## $ POSITION.x &lt;chr&gt; &quot; SG&quot;, &quot; PG&quot;, &quot; C&quot;, &quot; PG&quot;, &quot; PG&quot;, &quot; SG&quot;, &quot; PG&quot;, &quot; F&quot;, &quot; SF…
+## $ RPM        &lt;dbl&gt; -6.60, -5.79, -5.69, -5.32, -5.24, -4.95, -4.93, -4.69, -4…
+## $ POSITION.y &lt;fct&gt;  SG,  PG,  C,  PG,  PG,  SG,  PG,  F,  SF,  SF,  SG,  PG, …
+## $ TEAM.y     &lt;fct&gt; Orlando Magic, Memphis Grizzlies, Philadelphia 76ers, Phoe…
+## $ SALARY     &lt;dbl&gt; 3909840, 1793760, 4788840, 12606250, 3386598, 980431, 7250…</code></pre>
+<pre class="r"><code># summarizes the number of distinct observations for each variable 
+joindata %&gt;% summarise_all(n_distinct) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 1
+## Variables: 12
+## $ NAME       &lt;int&gt; 353
+## $ TEAM.x     &lt;int&gt; 51
+## $ GP         &lt;int&gt; 74
+## $ MPG        &lt;int&gt; 214
+## $ ORPM       &lt;int&gt; 268
+## $ DRPM       &lt;int&gt; 266
+## $ WINS       &lt;int&gt; 282
+## $ POSITION.x &lt;int&gt; 7
+## $ RPM        &lt;int&gt; 284
+## $ POSITION.y &lt;int&gt; 9
+## $ TEAM.y     &lt;int&gt; 30
+## $ SALARY     &lt;int&gt; 279</code></pre>
+<pre class="r"><code># Number of players in each team
+joindata %&gt;% 
+  group_by(TEAM.y) %&gt;%
+  summarise(n=n()) %&gt;% arrange(desc(n)) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 30
+## Variables: 2
+## $ TEAM.y &lt;fct&gt; Charlotte Hornets, Atlanta Hawks, Boston Celtics, Memphis Griz…
+## $ n      &lt;int&gt; 18, 15, 15, 15, 15, 14, 14, 14, 14, 13, 13, 13, 12, 12, 12, 12…</code></pre>
+<pre class="r"><code># Who has the minimum salary 
+joindata %&gt;%
+  filter(SALARY==min(SALARY)) %&gt;% summarise(NAME, TEAM.y, POSITION.x, SALARY)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   NAME           TEAM.y           POSITION.x SALARY
+##   &lt;chr&gt;          &lt;fct&gt;            &lt;chr&gt;       &lt;dbl&gt;
+## 1 Pierre Jackson Dallas Mavericks &quot; PG&quot;       31969</code></pre>
+<pre class="r"><code># Who has the maximum salary
+joindata %&gt;%
+  filter(SALARY==max(SALARY)) %&gt;% summarise(NAME, TEAM.y, POSITION.x, SALARY)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   NAME         TEAM.y              POSITION.x   SALARY
+##   &lt;chr&gt;        &lt;fct&gt;               &lt;chr&gt;         &lt;dbl&gt;
+## 1 LeBron James Cleveland Cavaliers &quot; SF&quot;      30963450</code></pre>
+<pre class="r"><code># Shows top 5 player RPMs in descending order (highest first)
+joindata %&gt;% top_n(5, RPM) %&gt;% arrange(desc(RPM))</code></pre>
+<pre><code>## # A tibble: 5 x 12
+##   NAME  TEAM.x    GP   MPG  ORPM  DRPM  WINS POSITION.x   RPM POSITION.y TEAM.y
+##   &lt;chr&gt; &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt; 
+## 1 LeBr… CLE       74  37.8  6.49  1.93  20.4 &quot; SF&quot;       8.42 &quot; SF&quot;      Cleve…
+## 2 Chri… LAC       61  31.5  5.16  2.76  13.5 &quot; PG&quot;       7.92 &quot; PG&quot;      LA Cl…
+## 3 Step… GS        79  33.4  7.27  0.14  18.8 &quot; PG&quot;       7.41 &quot; PG&quot;      Golde…
+## 4 Dray… GS        76  32.5  1.55  5.59  16.8 &quot; PF&quot;       7.14 &quot; PF&quot;      Golde…
+## 5 Kawh… SA        74  33.4  5.83  1.25  15.5 &quot; SF&quot;       7.08 &quot; SF&quot;      San A…
+## # … with 1 more variable: SALARY &lt;dbl&gt;</code></pre>
+<pre class="r"><code># creates new variable that calculates salary in millions and the player salary per game
+mutatedat&lt;-joindata %&gt;% mutate(SALARY_PER_GAME= SALARY/GP, SALARY_MILLIONS=SALARY/1000000)
+mutatedat %&gt;% select(NAME,SALARY,SALARY_MILLIONS,GP,SALARY_PER_GAME) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 360
+## Variables: 5
+## $ NAME            &lt;chr&gt; &quot;LeBron James&quot;, &quot;Stephen Curry&quot;, &quot;Jimmy Butler&quot;, &quot;Rus…
+## $ SALARY          &lt;dbl&gt; 30963450, 12112359, 17552209, 26500000, 15330435, 212…
+## $ SALARY_MILLIONS &lt;dbl&gt; 30.963450, 12.112359, 17.552209, 26.500000, 15.330435…
+## $ GP              &lt;int&gt; 74, 79, 76, 81, 76, 81, 81, 74, 61, 73, 80, 75, 62, 6…
+## $ SALARY_PER_GAME &lt;dbl&gt; 418425.00, 153321.00, 230950.12, 327160.49, 201716.25…</code></pre>
+<pre class="r"><code># Shows how many players each team is paying and the mean, sd, and se values of SALARY in descending order of mean salary
+joindata %&gt;% 
+  group_by(TEAM.y) %&gt;% 
+  summarize(mean_salary=mean(SALARY),sd_salary=sd(SALARY),count_salary=n(),se=(sd_salary/sqrt(count_salary))) %&gt;% arrange(desc(mean_salary)) %&gt;% glimpse()</code></pre>
+<pre><code>## Observations: 30
+## Variables: 5
+## $ TEAM.y       &lt;fct&gt; Golden State Warriors, Cleveland Cavaliers, Houston Rock…
+## $ mean_salary  &lt;dbl&gt; 12703400, 12568668, 9140174, 8694710, 8478242, 8338191, …
+## $ sd_salary    &lt;dbl&gt; 8076054, 9081135, 9375938, 7395071, 9317001, 6359614, 77…
+## $ count_salary &lt;int&gt; 7, 10, 8, 12, 7, 13, 11, 13, 9, 12, 11, 11, 11, 15, 12, …
+## $ se           &lt;dbl&gt; 3052461, 2871707, 3314894, 2134773, 3521495, 1763840, 23…</code></pre>
+<pre class="r"><code># Correlation matrix for numeric variables 
+joindata %&gt;% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %&gt;% cor()</code></pre>
+<pre><code>##                 GP         MPG        ORPM         DRPM      WINS       RPM
+## GP      1.00000000 0.656771309  0.45030338 -0.029653819 0.4730848 0.3519280
+## MPG     0.65677131 1.000000000  0.66035590  0.009807745 0.6856531 0.5504297
+## ORPM    0.45030338 0.660355896  1.00000000 -0.088588364 0.8115877 0.7668865
+## DRPM   -0.02965382 0.009807745 -0.08858836  1.000000000 0.3968252 0.5713222
+## WINS    0.47308476 0.685653056  0.81158771  0.396825225 1.0000000 0.9244010
+## RPM     0.35192798 0.550429698  0.76688650  0.571322242 0.9244010 1.0000000
+## SALARY  0.33936918 0.584529388  0.49173011  0.100315162 0.5402904 0.4698033
+##           SALARY
+## GP     0.3393692
+## MPG    0.5845294
+## ORPM   0.4917301
+## DRPM   0.1003152
+## WINS   0.5402904
+## RPM    0.4698033
+## SALARY 1.0000000</code></pre>
+<p>Using the various dplyr functions, I was able to explore my joined dataset and calculate multiple summary statistics. In order to remove redundant variables that were formed as a result of joining both datasets, I used the select function to eliminate “POSITION.x” and “TEAM.y”. Using the filter function, I was able to isolate data for a specific NBA player or team during the 2017 NBA season, which I did for Kevin Durant and the Dallas Mavericks. When filtering for the team Dallas Mavericks, it showed 7 observations meaning that the dataset included 7 Mavs players, whereas filtering for the player Kevin Durant produced 1 observation with 12 variables. To organize the dataset in terms of descending salary or ascending RPM, I used group_by to group the table by player name and then used the arrange() function. When arranging by descending salary, the names at the top of the list were not too surprising like Lebron James and Russell Westbrook. Arranging players by ascending RPM showed the “least efficient” or players with the lowest RPM values at the top of the table, such as Mario Hezonja and Jahlil Okafor.</p>
+<p>In order to calculate summary statistics, I used summarize(), mutate(), and group_by(). For example, to determine the number of unique observations (n) for each variable, I used the summarize_all() function. To determine the number of players present for each team, I used group_by to group the data by team, and then piped it into summarize. I found it interesting that a majority of players in the dataset (18) belonged to the Charlotte Hornets. Using filter() and summarize(), I was able to determine that Pierre Jackson of the Mavs had the lowest salary in the dataset while Lebron James (shocker) had the highest. The function top_n allowed me to produce a table with the top 5 players in terms of their RPM values, which in essence are the top 5 most efficient players in the league. Since dealing with salary values in the millions can be somewhat confusing to look at, I decided to use the mutate() function to create a new variable, SALARY_MILLIONS, which divides the player salary by 1,000,000 to yield the salary in millions. Also, I created a variable called SALARY_PER_GAME, which divides the player’s salary by the number of games they played (GP). Both of these variables are depicted in the table above. To calculate average summary statistics of salary for each team, I grouped the data by team and used summarize() to create 4 new variables. The resulting dataset contained mean salary, standard deviation of salary, standard error, and number of players per team in the dataset. Arranging by descending mean salary helped determine that the Golden State Warriors have 7 players in the dataset whom they paid an average salary of 12,703,400 dollars with a standard deviation of 8,076,054 dollars in the 2017 season.
+Finally, a correlation matrix for all numeric variables was generated by using select() to remove all categorical variables and piping it to cor(). This showed that the highest positive correlation between 2 numeric variables is 0.924 between RPM and WINS, the latter of which is a variable that provides an estimate of the number of wins a player has contributed to his team’s win total based on RPM and possessions played. This makes sense that both variables are strongly correlated since they are in essence functions of one another. The lowest correlation between two variables is -0.0886 between ORPM and DRPM, since they are essentially opposites with one measuring the points scored per 100 offensive possessions and the other measuring the points allowed per 100 defensive possessions.</p>
+</div>
+<div id="visualising" class="section level3">
+<h3>4. Visualising</h3>
+<pre class="r"><code>library(ggplot2)
+
+# Plots the mean salary (in millions) for each team based on player position as a bar plot
+ggplot(data = mutatedat, aes(x=TEAM.y, y=SALARY_MILLIONS, fill=POSITION.x)) + 
+  geom_bar(aes(y=SALARY_MILLIONS), stat = &quot;summary&quot;, fun.y=&quot;mean&quot;) +
+  theme_dark() + scale_fill_brewer() + theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  xlab(&quot;NBA Team&quot;)+
+  ylab(&quot;Mean salary (in millions of $)&quot;)+
+  ggtitle(&quot;Mean Combined Salary of NBA Teams based on Player Position&quot;) + labs(fill = &quot;Position&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># scatterplot showing relationship between player RPM and corresponding salary
+ggplot(data = mutatedat, aes(x= RPM, y=SALARY_MILLIONS)) +
+  geom_point(aes(y=SALARY_MILLIONS), color=&quot;blue&quot;)+ 
+  ggtitle(&quot;NBA Player Salary based on Real Plus Minus&quot;)+
+  xlab(&quot;Real Plus Minus (RPM)&quot;)+ ylab(&quot;Annual Salary (in millions of $)&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p>The first plot pictured above is a bar plot, which plots the mean salary (in millions of dollars) for each NBA team based on player position. Each bar is filled with multiple shades of blue, each shade representing a specific NBA position as labeled by the legend. The team with the highest mean combined salary is the Cleveland Caveliers, which makes sense since Lebron James alone has a salary of around $30 million. Comparitively, teams like the Brooklyn Nets, Detroit Pistons, and Minnesota Timberwolves have a mean combined salary of less than 30 million. When looking at the distribution of player position in relation to salary, PF and PG account for a majority of most of the bars. This is probably because point guards and power forwards are required to handle the ball a lot, and they have to be the primary playmakers in many situations.</p>
+<p>The second plot is a scatterplot that shows the relationship between a player’s RPM (real plus minus) on the x axis and their corresponding annual salary in millions of dollars. It is evident that there is a positive correlation between RPM and salary, where a higher RPM corresponds to a higher salary and vice versa. As seen by the cluster of blue dots in the middle of the plot, the majority of NBA players are average in terms of efficiency with their RPMs hovering around 0. As a result, their salary is realtively quite low on the spectrum ranging from $1-10 million dollars. However, as the RPM and salary values become more extreme, the dots appear to be more spread out. This explains why players like Lebron James, Russell Westbrook, and James Harden have astronomically high salaries; their real plus minus values are significantly higher than the average NBA player. This allows elite/efficient players like them to earn 2 to 3 times as much as their fellow teammates.</p>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>5. Dimensionality Reduction</h3>
+<pre class="r"><code>nba_pca&lt;- joindata %&gt;% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %&gt;% 
+  scale() %&gt;% prcomp()
+
+joindata %&gt;% select(-c(NAME,TEAM.x,TEAM.y,POSITION.x,POSITION.y)) %&gt;% cor() %&gt;% eigen()</code></pre>
+<pre><code>## eigen() decomposition
+## $values
+## [1] 4.032515e+00 1.360108e+00 6.694095e-01 6.221418e-01 2.486631e-01
+## [6] 6.716236e-02 1.110223e-16
+## 
+## $vectors
+##            [,1]       [,2]       [,3]       [,4]         [,5]        [,6]
+## [1,] -0.3135877  0.3517302 -0.7489437 -0.1264400  0.446948933  0.03579862
+## [2,] -0.4126864  0.2832263 -0.1982677  0.1106320 -0.824267685  0.13603698
+## [3,] -0.4247047  0.1813957  0.4430136 -0.3631573  0.172997880  0.32316796
+## [4,] -0.1416868 -0.7743086 -0.3591970  0.1528395 -0.061624265  0.16106942
+## [5,] -0.4695478 -0.1686739  0.1001630 -0.1683765 -0.008882161 -0.84416337
+## [6,] -0.4412330 -0.3494356  0.1335915 -0.2007521  0.102838768  0.37005882
+## [7,] -0.3402085  0.1142558  0.2158943  0.8647996  0.276475882  0.01661902
+##               [,7]
+## [1,]  1.338387e-16
+## [2,] -5.401677e-16
+## [3,] -5.693957e-01
+## [4,] -4.452502e-01
+## [5,]  4.530064e-16
+## [6,]  6.910432e-01
+## [7,]  1.168230e-16</code></pre>
+<pre class="r"><code>summary(nba_pca, loadings=T)</code></pre>
+<pre><code>## Warning: In summary.prcomp(nba_pca, loadings = T) :
+##  extra argument &#39;loadings&#39; will be disregarded</code></pre>
+<pre><code>## Importance of components:
+##                           PC1    PC2     PC3     PC4     PC5     PC6       PC7
+## Standard deviation     2.0081 1.1662 0.81817 0.78876 0.49866 0.25916 3.936e-16
+## Proportion of Variance 0.5761 0.1943 0.09563 0.08888 0.03552 0.00959 0.000e+00
+## Cumulative Proportion  0.5761 0.7704 0.86600 0.95488 0.99041 1.00000 1.000e+00</code></pre>
+<pre class="r"><code># Loadings plot (which variables contribute to which PCs)
+nba_pca$rotation[,1:2]%&gt;%as.data.frame%&gt;%rownames_to_column%&gt;%
+  ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+  geom_vline(aes(xintercept=0),lty=2)+ylab(&quot;PC2&quot;)+xlab(&quot;PC1&quot;)+
+  geom_segment(aes(x=0,y=0,xend=PC1,yend=PC2),arrow=arrow(),col=&quot;red&quot;)+
+  geom_label(aes(x=PC1*1.1,y=PC2*1.1,label=rowname)) + ggtitle(&quot;Loadings Plot&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>By running a principal component analysis on all numeric variables in the combined dataset, I was able to interpret the correlation between various numeric variables. The loadings plot above shows which variables contribute to which principal components (either PC1 or PC2). Based on the angles between the variable vectors, SALARY and ORPM (offensive real plus minus) have the highest correlation because the angle between both vectors is the smallest. This means that more offensively efficient players are likely to have a higher salary. RPM and WINS also have a high correlation, which makes sense since WINS is a function of the player’s Real-Plus-Minus and his number of possessions played. Furthermore, ORPM and MPG have a high correlation meaning that more minutes played in a game correlates with a higher offensive efficiency rating, or simply more minutes = more points scored.</p>
+</div>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
